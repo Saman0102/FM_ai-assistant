@@ -313,15 +313,6 @@ This will execute:
 3. RAG-based retrieval
 4. Tool calling demonstration
 
-## Optional Enhancements
-
-- [ ] Support for additional LLM providers (Bedrock)
-- [ ] Alternative vector databases (Pinecone, Weaviate)
-- [x] Local model serving with vLLM (optional `local` Compose profile)
-- [ ] Response streaming
-- [ ] Conversation memory optimization
-- [ ] Model fine-tuning pipeline
-- [ ] Distributed cache and performance metrics
 
 ## Error Handling
 
@@ -349,7 +340,11 @@ The assistant includes comprehensive error handling:
 
 ## License
 
-This project is part of FuseMachines AI Engineering curriculum.
+This project is licensed under the [MIT License](LICENSE).
+
+Copyright (c) 2026 Saman0102.
+
+This project was developed as part of the FuseMachines AI Engineering curriculum.
 
 ## Support
 
