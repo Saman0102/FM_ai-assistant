@@ -1,0 +1,18 @@
+services:
+  assistant:
+    build: .
+    env_file:
+      - .env
+    environment:
+      PYTHONPATH: /app
+      CACHE_TTL_SECONDS: ${CACHE_TTL_SECONDS:-300}
+      RATE_LIMIT_REQUESTS: ${RATE_LIMIT_REQUESTS:-30}
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      - chroma_data:/app/chroma_data
+    command: uvicorn api:app --host 0.0.0.0 --port 8000
+    restart: unless-stopped
+
+volumes:
+  chroma_data:
