@@ -61,8 +61,12 @@ ai_assistant/
 ├── data/                  # Data directory for documents
 ├── assistant.py           # Main AI Assistant class
 ├── requirements.txt       # Python dependencies
+├── api.py                # FastAPI backend and reliability layer
+├── static/index.html     # Browser chat UI
 ├── Dockerfile            # Container configuration
-├── .env.example          # Environment variables template
+├── docker-compose.yml    # Application and optional vLLM services
+├── .env.example          # Gemini/hosted configuration template
+├── .env.vllm.example     # Local vLLM configuration template
 └── README.md             # This file
 ```
 
@@ -98,28 +102,29 @@ ai_assistant/
 ### Docker Setup
 
 ```bash
-# Build image
-docker build -t ai-assistant:latest .
-
-# Run container
-docker run --env-file .env ai-assistant:latest
+# Start the API and web UI
+docker compose up --build
 ```
+
+Open http://localhost:8000 after the container starts. Docker Desktop must be running.
 
 ## Configuration
 
 Edit `.env` file with your settings:
 
 ```env
-# LLM Configuration
-LLM_PROVIDER=openai          # openai or claude
-MODEL_NAME=gpt-4-turbo       # Model to use
-API_KEY=your_api_key_here    # Your API key
+# LLM Configuration (Google AI Studio)
+LLM_PROVIDER=gemini
+MODEL_NAME=gemini-3.6-flash
+API_KEY=your_google_ai_studio_key_here
+LLM_BASE_URL=
 TEMPERATURE=0.7              # Model creativity (0-1)
 TOP_P=0.9                    # Nucleus sampling
 MAX_TOKENS=2048              # Max response length
 
 # RAG Configuration
 EMBEDDING_MODEL=text-embedding-3-small
+CHROMA_PERSIST_DIR=./chroma_data
 CHUNK_SIZE=1000
 CHUNK_OVERLAP=100
 TOP_K_RESULTS=5
@@ -194,6 +199,31 @@ assistant.tool_registry.register_tool(
 ```
 
 ## Architecture
+
+In this project, the flow starts from the user interface to the FastAPI backend, through the assistant orchestrator, and finally back to the user.
+
+The main request flow is:
+
+```text
+User
+    -> Web UI
+    -> FastAPI Backend
+    -> AI Assistant Orchestrator
+             |- Gemini, OpenAI, Claude, or local vLLM
+             |- RAG Pipeline
+             |    |- Document Loader
+             |    |- Document Chunker
+             |    |- Embeddings
+             |    `- Chroma Vector Database
+             `- Tool System
+                        |- Calculator
+                        `- Get Time
+    -> Formatted Response
+```
+
+The orchestrator prepares the prompt, optionally retrieves relevant document context, and provides the available tools to the LLM. If the model requests a tool, the tool executor runs it and sends the result back to the model before the final response is returned. Docker Compose manages the application and the optional local vLLM service.
+
+For submission, the architecture diagram demonstrates how the system is designed, not only what individual files contain. The detailed component, data-flow, RAG, tool-calling, and deployment diagrams are provided below.
 
 ```
 User Query
@@ -283,18 +313,15 @@ This will execute:
 3. RAG-based retrieval
 4. Tool calling demonstration
 
-## Future Enhancements
+## Optional Enhancements
 
-- [ ] Support for additional LLM providers (Gemini, Bedrock)
+- [ ] Support for additional LLM providers (Bedrock)
 - [ ] Alternative vector databases (Pinecone, Weaviate)
 - [x] Local model serving with vLLM (optional `local` Compose profile)
 - [ ] Response streaming
 - [ ] Conversation memory optimization
-- [ ] Performance metrics and monitoring
-- [ ] Web API interface (Uvicorn/FastAPI)
-- [ ] Web UI (Streamlit/Gradio)
 - [ ] Model fine-tuning pipeline
-- [ ] Cost optimization and caching
+- [ ] Distributed cache and performance metrics
 
 ## Error Handling
 
@@ -357,6 +384,8 @@ uvicorn api:app --reload --port 8000
 ```
 
 Open http://localhost:8000. API documentation is available at http://localhost:8000/docs.
+
+Use exactly one provider configuration at a time. For Gemini, keep `LLM_PROVIDER=gemini`, `MODEL_NAME=gemini-3.6-flash`, and your Google AI Studio key. For local vLLM, replace those values using `.env.vllm.example`; do not append a second provider block because the last duplicate environment variable wins.
 
 ### Run with Docker Compose
 
