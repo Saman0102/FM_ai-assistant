@@ -9,9 +9,10 @@ from typing import Optional
 @dataclass
 class LLMConfig:
     """LLM Configuration"""
-    provider: str = os.getenv("LLM_PROVIDER", "openai")  # openai, claude, gemini, bedrock
-    model: str = os.getenv("MODEL_NAME", "gpt-4-turbo")
+    provider: str = os.getenv("LLM_PROVIDER", "gemini")  # gemini, openai, claude
+    model: str = os.getenv("MODEL_NAME", "gemini-3.6-flash")
     api_key: str = os.getenv("API_KEY", "")
+    base_url: str = os.getenv("LLM_BASE_URL", "")
     temperature: float = float(os.getenv("TEMPERATURE", "0.7"))
     top_p: float = float(os.getenv("TOP_P", "0.9"))
     max_tokens: int = int(os.getenv("MAX_TOKENS", "2048"))
@@ -36,8 +37,8 @@ class AssistantConfig:
     rag: RAGConfig = field(default_factory=RAGConfig)
     system_prompt: str = """You are an intelligent AI assistant capable of answering questions, 
 reasoning about problems, and using tools to complete tasks. 
-You provide accurate, helpful, and structured responses in JSON format.
-Always explain your reasoning and be transparent about what tools you're using."""
+You provide accurate and helpful responses in clear, concise natural language.
+Return JSON only when the user explicitly requests structured JSON output."""
     enable_tool_calling: bool = True
     enable_rag: bool = True
     debug: bool = os.getenv("DEBUG", "false").lower() == "true"

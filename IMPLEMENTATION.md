@@ -221,9 +221,10 @@ results = vector_store.similarity_search("query", k=5)
 
 ### ✅ Requirement 6: Local Deployment
 
-- Ready for vLLM integration (commented in requirements)
+- vLLM client uses the OpenAI-compatible API
+- Optional `local` Docker Compose profile serves Qwen locally
 - Modular design allows easy LLM provider swapping
-- Example configuration for local models
+- `.env.vllm.example` provides the local configuration
 
 ### ✅ Requirement 7: Containerization
 

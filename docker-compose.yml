@@ -14,5 +14,19 @@ services:
     command: uvicorn api:app --host 0.0.0.0 --port 8000
     restart: unless-stopped
 
+  vllm:
+    profiles: ["local"]
+    image: vllm/vllm-openai:latest
+    ipc: host
+    environment:
+      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN:-}
+    ports:
+      - "${VLLM_HOST_PORT:-8001}:8000"
+    command: >-
+      --model ${VLLM_MODEL:-Qwen/Qwen2.5-1.5B-Instruct}
+      --host 0.0.0.0
+      --port 8000
+      --tensor-parallel-size ${VLLM_TP_SIZE:-1}
+
 volumes:
   chroma_data:

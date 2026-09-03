@@ -60,7 +60,7 @@ class PromptManager:
             tools_list = ", ".join(available_tools)
             prompt += f"\n\n[TOOL ACCESS] You can use these tools: {tools_list}. Use tools when appropriate."
 
-        prompt += "\n\n[OUTPUT] Always provide responses in valid JSON format when possible."
+        prompt += "\n\n[OUTPUT] Use clear natural language by default. Return valid JSON only when explicitly requested."
 
         return prompt
 

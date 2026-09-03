@@ -287,7 +287,7 @@ This will execute:
 
 - [ ] Support for additional LLM providers (Gemini, Bedrock)
 - [ ] Alternative vector databases (Pinecone, Weaviate)
-- [ ] Local model serving with vLLM
+- [x] Local model serving with vLLM (optional `local` Compose profile)
 - [ ] Response streaming
 - [ ] Conversation memory optimization
 - [ ] Performance metrics and monitoring
@@ -385,3 +385,28 @@ Open http://localhost:8000. Stop it with `docker compose down`.
 | Tests                            | `tests/test_api.py`                       |
 
 ONNX conversion is not applicable to the current path because the application calls hosted LLM APIs rather than loading model weights locally.
+
+### Run the local vLLM model
+
+The project includes a vLLM service using the OpenAI-compatible API. To use it, change the LLM section in `.env`:
+
+```env
+LLM_PROVIDER=vllm
+MODEL_NAME=Qwen/Qwen2.5-1.5B-Instruct
+API_KEY=EMPTY
+LLM_BASE_URL=http://vllm:8000/v1
+```
+
+You can copy the complete template with `cp .env.vllm.example .env`.
+
+Then start both services with the `local` profile:
+
+```bash
+docker compose --profile local up --build
+```
+
+The assistant UI remains at http://localhost:8000. The vLLM API is available at http://localhost:8001/v1.
+
+The default model is `Qwen/Qwen2.5-1.5B-Instruct`; change `VLLM_MODEL` and `MODEL_NAME` together when selecting another Hugging Face model. Private or gated models may require `HF_TOKEN` in `.env`.
+
+vLLM normally requires a Linux host with an NVIDIA GPU and compatible NVIDIA Container Toolkit. Docker Desktop on macOS, especially Apple Silicon, is suitable for the Gemini configuration but generally cannot provide the CUDA environment required by this vLLM image. Run the local profile on a GPU-enabled Linux machine or cloud VM for the local-model demonstration.

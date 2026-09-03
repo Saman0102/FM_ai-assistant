@@ -114,14 +114,16 @@ class ChromaVectorStore(BaseVectorStore):
 
         persist_directory = os.getenv("CHROMA_PERSIST_DIR", "./chroma_data")
         self.client = chromadb.PersistentClient(path=persist_directory)
-        try:
-            self.embedding_function = embedding_functions.OpenAIEmbeddingFunction(
-                api_key=os.getenv("API_KEY"),
-                model_name=embedding_model
-            )
-        except:
-            # Fallback to default embedding
+        if os.getenv("LLM_PROVIDER", "openai").lower() in {"gemini", "google"}:
             self.embedding_function = None
+        else:
+            try:
+                self.embedding_function = embedding_functions.OpenAIEmbeddingFunction(
+                    api_key=os.getenv("API_KEY"),
+                    model_name=embedding_model
+                )
+            except Exception:
+                self.embedding_function = None
 
         self.collection = self.client.get_or_create_collection(
             name=collection_name,

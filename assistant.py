@@ -40,6 +40,7 @@ class AIAssistant:
             provider=self.config.llm.provider,
             api_key=self.config.llm.api_key,
             model=self.config.llm.model,
+            base_url=self.config.llm.base_url,
             temperature=self.config.llm.temperature,
             top_p=self.config.llm.top_p,
             max_tokens=self.config.llm.max_tokens
